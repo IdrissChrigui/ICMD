@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block extra_style %}
+<style>
+.chart-container{position:relative;height:220px;}
+.activity-list{max-height:280px;overflow-y:auto;}
+.activity-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:0.82rem;}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.activity-time{color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.7rem;white-space:nowrap;}
+.quick-action{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:4px;text-decoration:none;color:var(--muted);transition:all 0.2s;text-align:center;}
+.quick-action:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.05);}
+.quick-action svg{width:28px;height:28px;}
+.quick-action span{font-size:0.8rem;letter-spacing:1px;font-weight:600;text-transform:uppercase;}
+</style>
+{% endblock %}
+{% block content %}
+<div class="grid grid-4 mb-24">
+  <div class="stat-card blue"><div class="stat-label">Paquets Totaux</div><div class="stat-value blue" id="dash-total">0</div><div class="stat-sub">depuis le démarrage</div></div>
+  <div class="stat-card green"><div class="stat-label">Volume Données</div><div class="stat-value green" id="dash-bytes">0 B</div><div class="stat-sub">données capturées</div></div>
+  <div class="stat-card red"><div class="stat-label">Suspects</div><div class="stat-value red" id="dash-susp">0</div><div class="stat-sub">connexions alertes</div></div>
+  <div class="stat-card warn"><div class="stat-label">Protocoles</div><div class="stat-value warn">3</div><div class="stat-sub">TCP / UDP / ICMP</div></div>
+</div>
+<div class="grid grid-2 mb-24">
+  <div class="card">
+    <div class="card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg><h3>Distribution Protocoles</h3></div>
+    <div class="card-body"><div class="chart-container"><canvas id="protoChart"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><h3>Trafic en Temps Réel</h3></div>
+    <div class="card-body"><div class="chart-container"><canvas id="trafficChart"></canvas></div></div>
+  </div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <div class="card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><h3>Activité Récente</h3></div>
+    <div class="card-body" style="padding:0 20px;"><div class="activity-list" id="activity-list"><div class="activity-item"><div class="activity-dot" style="background:var(--muted)"></div><span style="color:var(--muted)">En attente de capture...</span></div></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><h3>Actions Rapides</h3></div>
+    <div class="card-body"><div class="grid grid-2" style="gap:12px;">
+      <a href="/capture" class="quick-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="currentColor" opacity="0.3"/></svg><span>Capture Live</span></a>
+      <a href="/pcap" class="quick-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Analyser PCAP</span></a>
+      <a href="/reports" class="quick-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Rapport</span></a>
+      <a href="/register" class="quick-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><span>Comptes</span></a>
+    </div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const protoChart = new Chart(document.getElementById('protoChart').getContext('2d'), {
+  type:'doughnut',
+  data:{labels:['TCP','UDP','ICMP','Autre'],datasets:[{data:[0,0,0,0],backgroundColor:['rgba(0,212,255,0.7)','rgba(0,255,136,0.7)','rgba(255,170,0,0.7)','rgba(74,122,150,0.5)'],borderColor:['#00d4ff','#00ff88','#ffaa00','#4a7a96'],borderWidth:1}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'var(--text)',font:{family:'Share Tech Mono',size:11},padding:12}}},cutout:'65%'}
+});
+const trafficLabels=[],trafficData=[];
+const trafficChart = new Chart(document.getElementById('trafficChart').getContext('2d'), {
+  type:'line',
+  data:{labels:trafficLabels,datasets:[{label:'Paquets/s',data:trafficData,borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,0.08)',borderWidth:2,fill:true,tension:0.4,pointRadius:0}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a7a96',font:{family:'Share Tech Mono',size:10}},grid:{color:'rgba(13,33,55,0.8)'}},y:{ticks:{color:'#4a7a96',font:{family:'Share Tech Mono',size:10}},grid:{color:'rgba(13,33,55,0.8)'},beginAtZero:true}}}
+});
+let tCounter=0;
+const socket=io();
+socket.on('stats_update',s=>{
+  document.getElementById('dash-total').textContent=s.total.toLocaleString();
+  document.getElementById('dash-susp').textContent=s.suspicious.toLocaleString();
+  const b=s.bytes; document.getElementById('dash-bytes').textContent=b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';
+  protoChart.data.datasets[0].data=[s.tcp,s.udp,s.icmp,s.other]; protoChart.update('none');
+  updateSidebarStatus(true);
+});
+socket.on('new_packet',p=>{
+  tCounter++;
+  const list=document.getElementById('activity-list');
+  const color=p.suspicious?'var(--danger)':p.proto==='TCP'?'var(--accent)':p.proto==='UDP'?'var(--accent2)':'var(--warn)';
+  const item=document.createElement('div'); item.className='activity-item';
+  item.innerHTML=`<div class="activity-dot" style="background:${color}"></div><span style="flex:1">${p.src} → ${p.dst}</span><span class="badge badge-${p.proto.toLowerCase()}">${p.proto}</span>${p.suspicious?'<span class="badge badge-susp">SUSPECT</span>':''}<span class="activity-time">${p.timestamp}</span>`;
+  list.insertBefore(item,list.firstChild);
+  while(list.children.length>20)list.removeChild(list.lastChild);
+});
+setInterval(()=>{
+  if(tCounter>0){
+    const now=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    trafficLabels.push(now); trafficData.push(tCounter); tCounter=0;
+    if(trafficLabels.length>20){trafficLabels.shift();trafficData.shift();}
+    trafficChart.update('none');
+  }
+},1000);
+fetch('/api/capture/status').then(r=>r.json()).then(d=>{
+  if(d.stats.total>0){
+    document.getElementById('dash-total').textContent=d.stats.total.toLocaleString();
+    protoChart.data.datasets[0].data=[d.stats.tcp,d.stats.udp,d.stats.icmp,d.stats.other];
+    protoChart.update('none');
+  }
+});
+</script>
+{% endblock %}

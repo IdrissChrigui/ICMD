@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Capture Live{% endblock %}
+{% block page_title %}Capture Live{% endblock %}
+{% block extra_style %}
+<style>
+.capture-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.iface-select{background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:9px 14px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem;min-width:160px;outline:none;}
+.iface-select:focus{border-color:var(--accent);}
+.status-bar{display:flex;align-items:center;gap:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;flex-wrap:wrap;}
+.si{display:flex;align-items:center;gap:8px;color:var(--muted);}
+.packets-wrap{max-height:calc(100vh - 390px);overflow-y:auto;}
+.pkt-row{cursor:pointer;}
+.pkt-row.selected{background:rgba(0,212,255,0.08)!important;}
+.detail-panel{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:16px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;display:none;}
+.detail-panel.show{display:block;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.df{display:flex;flex-direction:column;gap:2px;}
+.dl{font-size:0.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.rt{display:inline-flex;align-items:center;background:rgba(255,51,102,0.1);border:1px solid rgba(255,51,102,0.3);border-radius:2px;padding:2px 8px;font-size:0.7rem;color:var(--danger);margin:2px 4px 2px 0;}
+.live-ind{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:0.75rem;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+.live-dot.live{background:var(--danger);box-shadow:0 0 8px var(--danger);animation:blink2 0.8s ease infinite;}
+@keyframes blink2{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="card mb-16">
+  <div class="card-body" style="padding:16px 20px;">
+    <div class="capture-controls">
+      <div class="live-ind"><div class="live-dot" id="live-dot"></div><span id="live-label" style="color:var(--muted)">Inactif</span></div>
+      <select class="iface-select" id="iface-select"><option value="">Interface auto</option></select>
+      <button class="btn btn-success" id="btn-start" onclick="startCapture()"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Démarrer</button>
+      <button class="btn btn-danger" id="btn-stop" onclick="stopCapture()" disabled><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg>Arrêter</button>
+      <button class="btn btn-muted" onclick="clearPackets()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Vider</button>
+      <div style="flex:1"></div>
+      <span class="text-muted" id="dur">00:00:00</span>
+    </div>
+  </div>
+</div>
+<div class="status-bar mb-16">
+  <div class="si">Total: <span id="s-total" style="color:var(--accent)">0</span></div>
+  <div class="si">TCP: <span id="s-tcp" style="color:var(--accent)">0</span></div>
+  <div class="si">UDP: <span id="s-udp" style="color:var(--accent2)">0</span></div>
+  <div class="si">ICMP: <span id="s-icmp" style="color:var(--warn)">0</span></div>
+  <div class="si">Suspects: <span id="s-susp" style="color:var(--danger)">0</span></div>
+  <div class="si">Volume: <span id="s-bytes">0 B</span></div>
+</div>
+<div class="flex gap-12 items-center mb-16">
+  <input type="text" class="filter-input" id="fip" placeholder="Filtrer par IP..." oninput="applyFilter()">
+  <select class="filter-select" id="fproto" onchange="applyFilter()"><option value="">Tous protocoles</option><option value="TCP">TCP</option><option value="UDP">UDP</option><option value="ICMP">ICMP</option></select>
+  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.8rem;color:var(--muted)"><input type="checkbox" id="fsusp" onchange="applyFilter()" style="accent-color:var(--danger)">Suspects uniquement</label>
+  <div style="flex:1"></div>
+  <span class="text-muted" id="fc">0 paquets</span>
+</div>
+<div class="card mb-16">
+  <div class="card-body" style="padding:0;">
+    <div class="packets-wrap">
+      <table><thead><tr><th>#</th><th>Heure</th><th>IP Source</th><th>IP Destination</th><th>Proto</th><th>Port Src</th><th>Port Dst</th><th>Flags</th><th>Taille</th><th>Statut</th></tr></thead>
+      <tbody id="tbody"><tr><td colspan="10" style="text-align:center;color:var(--muted);padding:40px;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">En attente de capture...</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+<div class="detail-panel" id="dpanel">
+  <div class="flex items-center gap-12 mb-16"><h4 style="font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent)">Détails du Paquet</h4><div style="flex:1;height:1px;background:var(--border)"></div><button onclick="document.getElementById('dpanel').classList.remove('show')" style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;">×</button></div>
+  <div class="detail-grid" id="dcontent"></div>
+  <div id="dreasons" style="margin-top:12px;"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let allPkts=[],filtPkts=[],capturing=false,startTime=null,durTimer=null;
+const socket=io();
+fetch('/api/interfaces').then(r=>r.json()).then(d=>{const s=document.getElementById('iface-select');d.interfaces.forEach(i=>{const o=document.createElement('option');o.value=i;o.textContent=i;s.appendChild(o);});});
+socket.on('new_packet',p=>{allPkts.push(p);if(matchFilter(p)){filtPkts.push(p);appendRow(p);document.getElementById('fc').textContent=filtPkts.length+' paquets';}});
+socket.on('stats_update',s=>{document.getElementById('s-total').textContent=s.total;document.getElementById('s-tcp').textContent=s.tcp;document.getElementById('s-udp').textContent=s.udp;document.getElementById('s-icmp').textContent=s.icmp;document.getElementById('s-susp').textContent=s.suspicious;const b=s.bytes;document.getElementById('s-bytes').textContent=b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';updateSidebarStatus(true);});
+function startCapture(){const iface=document.getElementById('iface-select').value;fetch('/api/capture/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({iface:iface||null})}).then(r=>r.json()).then(()=>{capturing=true;startTime=Date.now();document.getElementById('btn-start').disabled=true;document.getElementById('btn-stop').disabled=false;document.getElementById('live-dot').classList.add('live');document.getElementById('live-label').textContent='En direct';document.getElementById('live-label').style.color='var(--danger)';durTimer=setInterval(updateDur,1000);showToast('Capture démarrée','success');});}
+function stopCapture(){fetch('/api/capture/stop',{method:'POST'}).then(r=>r.json()).then(()=>{capturing=false;document.getElementById('btn-start').disabled=false;document.getElementById('btn-stop').disabled=true;document.getElementById('live-dot').classList.remove('live');document.getElementById('live-label').textContent='Arrêtée';document.getElementById('live-label').style.color='var(--warn)';clearInterval(durTimer);updateSidebarStatus(false);showToast('Capture arrêtée — '+allPkts.length+' paquets','info');});}
+function clearPackets(){allPkts=[];filtPkts=[];document.getElementById('tbody').innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:40px;font-family:\'Share Tech Mono\',monospace;font-size:0.8rem;">En attente...</td></tr>';document.getElementById('fc').textContent='0 paquets';document.getElementById('dpanel').classList.remove('show');}
+function updateDur(){const e=Math.floor((Date.now()-startTime)/1000);document.getElementById('dur').textContent=`${String(Math.floor(e/3600)).padStart(2,'0')}:${String(Math.floor((e%3600)/60)).padStart(2,'0')}:${String(e%60).padStart(2,'0')}`;}
+function matchFilter(p){const ip=document.getElementById('fip').value.trim(),proto=document.getElementById('fproto').value,susp=document.getElementById('fsusp').checked;if(ip&&!p.src.includes(ip)&&!p.dst.includes(ip))return false;if(proto&&p.proto!==proto)return false;if(susp&&!p.suspicious)return false;return true;}
+function applyFilter(){filtPkts=allPkts.filter(matchFilter);const tbody=document.getElementById('tbody');tbody.innerHTML='';if(!filtPkts.length){tbody.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:40px;font-family:\'Share Tech Mono\',monospace;font-size:0.8rem;">Aucun résultat</td></tr>';}else{filtPkts.slice(-200).forEach(appendRow);}document.getElementById('fc').textContent=filtPkts.length+' paquets';}
+function pb(p){const m={TCP:'tcp',UDP:'udp',ICMP:'icmp'};return`<span class="badge badge-${m[p]||'other'}">${p}</span>`;}
+function appendRow(p){const tbody=document.getElementById('tbody');if(tbody.children.length===1&&tbody.children[0].children[0]?.colSpan==10)tbody.innerHTML='';const tr=document.createElement('tr');tr.className='pkt-row'+(p.suspicious?' suspicious':'');tr.innerHTML=`<td style="color:var(--muted)">${p.id}</td><td style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted)">${p.timestamp}</td><td style="font-family:'Share Tech Mono',monospace">${p.src}</td><td style="font-family:'Share Tech Mono',monospace">${p.dst}</td><td>${pb(p.proto)}</td><td style="color:var(--muted)">${p.sport??'—'}</td><td>${p.dport?`<strong>${p.dport}</strong>`:'—'}</td><td style="font-family:'Share Tech Mono',monospace;font-size:0.75rem">${p.flags??'—'}</td><td style="color:var(--muted)">${p.length}B</td><td>${p.suspicious?'<span class="badge badge-susp">⚠ SUSPECT</span>':'<span class="badge badge-ok">OK</span>'}</td>`;tr.onclick=()=>showDetail(p,tr);tbody.appendChild(tr);tbody.closest('.packets-wrap').scrollTop=9999;}
+function showDetail(p,row){document.querySelectorAll('.pkt-row.selected').forEach(r=>r.classList.remove('selected'));row.classList.add('selected');const panel=document.getElementById('dpanel');panel.classList.add('show');const fields=[['ID',p.id],['Heure',p.timestamp],['IP Source',p.src],['IP Destination',p.dst],['Protocole',p.proto],['Port Source',p.sport??'—'],['Port Destination',p.dport??'—'],['Flags TCP',p.flags??'—'],['Taille',p.length+' octets'],['Statut',p.suspicious?'⚠ SUSPECT':'✓ Normal']];document.getElementById('dcontent').innerHTML=fields.map(([l,v])=>`<div class="df"><span class="dl">${l}</span><span>${v}</span></div>`).join('');const rd=document.getElementById('dreasons');rd.innerHTML=p.reasons?.length?'<div style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Raisons</div>'+p.reasons.map(r=>`<span class="rt">⚠ ${r}</span>`).join(''):'';}
+fetch('/api/capture/status').then(r=>r.json()).then(d=>{if(d.running){document.getElementById('btn-start').disabled=true;document.getElementById('btn-stop').disabled=false;document.getElementById('live-dot').classList.add('live');document.getElementById('live-label').textContent='En direct';document.getElementById('live-label').style.color='var(--danger)';startTime=Date.now();durTimer=setInterval(updateDur,1000);}});
+</script>
+{% endblock %}
