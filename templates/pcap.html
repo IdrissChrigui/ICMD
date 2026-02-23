@@ -1,109 +1,313 @@
 {% extends "base.html" %}
 {% block title %}Analyser PCAP{% endblock %}
 {% block page_title %}Analyser Fichier PCAP{% endblock %}
+
 {% block extra_style %}
 <style>
-.upload-zone{border:2px dashed var(--border2);border-radius:6px;padding:48px 32px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:rgba(0,212,255,0.03);}
-.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
-.upload-icon{width:56px;height:56px;margin:0 auto 16px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;}
-.upload-icon svg{width:24px;height:24px;color:var(--accent);}
-.upload-title{font-size:1.1rem;font-weight:700;letter-spacing:2px;margin-bottom:8px;}
-.upload-sub{color:var(--muted);font-size:0.82rem;font-family:'Share Tech Mono',monospace;}
-.ext-badge{padding:3px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;font-size:0.7rem;font-family:'Share Tech Mono',monospace;color:var(--muted);display:inline-block;margin:8px 3px 0;}
-.progress-bar-wrap{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:16px;display:none;}
-.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width 0.3s;}
-.packets-wrap{max-height:420px;overflow-y:auto;}
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 12px; padding: 56px 32px;
+  text-align:center; cursor:pointer;
+  transition: all 0.3s; position:relative;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--indigo);
+  background: rgba(99,102,241,0.04);
+}
+.upload-zone input[type=file] {
+  position:absolute; inset:0; opacity:0; cursor:pointer;
+}
+.upload-icon {
+  width: 60px; height: 60px; margin:0 auto 18px;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+}
+.upload-icon svg { width:24px; height:24px; color:var(--indigo-lt); }
+.upload-title {
+  font-size:1.05rem; font-weight:700;
+  letter-spacing:0.04em; margin-bottom:8px;
+}
+.upload-sub {
+  color:var(--text-muted); font-size:0.8rem;
+  font-family:'IBM Plex Mono',monospace;
+}
+.ext-badge {
+  display:inline-block; margin:10px 3px 0;
+  padding:3px 10px;
+  background:var(--surface2); border:1px solid var(--border2);
+  border-radius:5px;
+  font-size:0.68rem; font-family:'IBM Plex Mono',monospace;
+  color:var(--text-muted);
+}
+
+/* Progress */
+.progress-wrap {
+  height: 3px; background:var(--border);
+  border-radius:2px; overflow:hidden;
+  margin-top:16px; display:none;
+}
+.progress-bar {
+  height:100%; width:0%;
+  background: linear-gradient(90deg, var(--indigo), var(--violet));
+  transition:width 0.3s;
+}
+
+/* Upload status */
+.upload-status {
+  margin-top:10px; font-size:0.76rem;
+  font-family:'IBM Plex Mono',monospace;
+  color:var(--text-muted);
+}
+
+/* Filter bar */
+.filter-bar {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px;
+}
+.filter-check {
+  display:flex; align-items:center; gap:6px;
+  cursor:pointer; font-size:0.78rem; color:var(--text-muted);
+  user-select:none;
+}
+.filter-check input { accent-color:var(--rose); cursor:pointer; }
+
+/* Packets wrap */
+.packets-wrap { max-height:420px; overflow-y:auto; }
 </style>
 {% endblock %}
+
 {% block content %}
+
+<!-- Upload card -->
 <div class="card mb-24">
-  <div class="card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg><h3>Importer un Fichier PCAP</h3></div>
+  <div class="card-header">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="12" y1="18" x2="12" y2="12"/>
+      <line x1="9" y1="15" x2="15" y2="15"/>
+    </svg>
+    <h3>Importer un Fichier PCAP</h3>
+  </div>
   <div class="card-body">
     <div class="upload-zone" id="upload-zone">
       <input type="file" id="pcap-file" accept=".pcap,.pcapng" onchange="uploadFile(this)">
-      <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <div class="upload-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
       <div class="upload-title">Déposer un fichier ici</div>
       <div class="upload-sub">ou cliquez pour sélectionner</div>
       <div><span class="ext-badge">.pcap</span><span class="ext-badge">.pcapng</span></div>
     </div>
-    <div class="progress-bar-wrap" id="prog-wrap"><div class="progress-bar" id="prog-bar"></div></div>
-    <div id="upload-status" style="margin-top:10px;font-size:0.78rem;font-family:'Share Tech Mono',monospace;color:var(--muted);"></div>
+    <div class="progress-wrap" id="prog-wrap">
+      <div class="progress-bar" id="prog-bar"></div>
+    </div>
+    <div class="upload-status" id="upload-status"></div>
   </div>
 </div>
 
+<!-- Results section (hidden until file loaded) -->
 <div id="pcap-section" style="display:none;">
+
+  <!-- Stats -->
   <div class="grid grid-4 mb-24">
-    <div class="stat-card blue"><div class="stat-label">Paquets Totaux</div><div class="stat-value blue" id="p-total">0</div></div>
-    <div class="stat-card green"><div class="stat-label">Volume</div><div class="stat-value green" id="p-bytes">0 B</div></div>
-    <div class="stat-card red"><div class="stat-label">Suspects</div><div class="stat-value red" id="p-susp">0</div></div>
-    <div class="stat-card warn"><div class="stat-label">Fichier</div><div class="stat-value warn" style="font-size:0.9rem;word-break:break-all;" id="p-file">—</div></div>
+    <div class="stat-card blue">
+      <div class="stat-label">Paquets Totaux</div>
+      <div class="stat-value blue" id="p-total">0</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Volume</div>
+      <div class="stat-value green" id="p-bytes">0 B</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">Suspects</div>
+      <div class="stat-value red" id="p-susp">0</div>
+    </div>
+    <div class="stat-card warn">
+      <div class="stat-label">Fichier</div>
+      <div class="stat-value warn" style="font-size:0.85rem;word-break:break-all;" id="p-file">—</div>
+    </div>
   </div>
-  <div class="flex gap-12 items-center mb-16">
+
+  <!-- Filter bar -->
+  <div class="filter-bar mb-16">
     <input type="text" class="filter-input" id="p-fip" placeholder="Filtrer par IP..." oninput="applyFilter()">
-    <select class="filter-select" id="p-fproto" onchange="applyFilter()"><option value="">Tous protocoles</option><option value="TCP">TCP</option><option value="UDP">UDP</option><option value="ICMP">ICMP</option></select>
-    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.8rem;color:var(--muted)"><input type="checkbox" id="p-fsusp" onchange="applyFilter()" style="accent-color:var(--danger)">Suspects uniquement</label>
+    <select class="filter-select" id="p-fproto" onchange="applyFilter()">
+      <option value="">Tous protocoles</option>
+      <option value="TCP">TCP</option>
+      <option value="UDP">UDP</option>
+      <option value="ICMP">ICMP</option>
+    </select>
+    <label class="filter-check">
+      <input type="checkbox" id="p-fsusp" onchange="applyFilter()">
+      Suspects uniquement
+    </label>
     <div style="flex:1"></div>
     <span class="text-muted" id="p-fc">0 paquets</span>
-    <button class="btn btn-primary" onclick="goReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Générer Rapport</button>
+    <button class="btn btn-primary" onclick="goReport()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      Générer Rapport
+    </button>
   </div>
-  <div class="card">
+
+  <!-- Table -->
+  <div class="card mb-16">
     <div class="card-body" style="padding:0;">
       <div class="packets-wrap">
-        <table><thead><tr><th>#</th><th>Heure</th><th>IP Source</th><th>IP Destination</th><th>Proto</th><th>Port Src</th><th>Port Dst</th><th>Flags</th><th>Taille</th><th>Statut</th></tr></thead>
-        <tbody id="p-tbody"></tbody></table>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Heure</th><th>IP Source</th><th>IP Destination</th>
+              <th>Proto</th><th>Port Src</th><th>Port Dst</th>
+              <th>Flags</th><th>Taille</th><th>Statut</th>
+            </tr>
+          </thead>
+          <tbody id="p-tbody"></tbody>
+        </table>
       </div>
     </div>
   </div>
-  <div class="flex items-center justify-between" style="margin-top:12px;">
+
+  <!-- Pagination -->
+  <div class="flex items-center justify-between">
     <div class="pagination" id="p-pag"></div>
     <span class="text-muted" id="p-pi"></span>
   </div>
 </div>
+
 {% endblock %}
+
 {% block scripts %}
 <script>
-let pcapPkts=[],pcapStats={},pcapFilt=[],curPage=1;
-const PER=50;
-const zone=document.getElementById('upload-zone');
-zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
-zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
-zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0]);});
-function uploadFile(i){if(i.files[0])processFile(i.files[0]);}
-function processFile(file){
-  if(!file.name.endsWith('.pcap')&&!file.name.endsWith('.pcapng')){showToast('Format invalide','error');return;}
-  const st=document.getElementById('upload-status');st.textContent=`Analyse de "${file.name}"...`;st.style.color='var(--accent)';
-  const pw=document.getElementById('prog-wrap'),pb=document.getElementById('prog-bar');pw.style.display='block';pb.style.width='0%';
-  let prog=0;const itv=setInterval(()=>{prog=Math.min(prog+Math.random()*15,85);pb.style.width=prog+'%';},150);
-  const fd=new FormData();fd.append('file',file);
-  fetch('/api/upload_pcap',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
-    clearInterval(itv);pb.style.width='100%';setTimeout(()=>pw.style.display='none',500);
-    if(d.error){st.textContent='Erreur: '+d.error;st.style.color='var(--danger)';return;}
-    pcapPkts=d.packets;pcapStats=d.stats;pcapFilt=[...pcapPkts];
-    st.textContent=`✓ "${file.name}" — ${d.packets.length} paquets`;st.style.color='var(--accent2)';
-    document.getElementById('p-file').textContent=file.name;
-    document.getElementById('p-total').textContent=pcapStats.total;
-    document.getElementById('p-susp').textContent=pcapStats.suspicious;
-    const b=pcapStats.bytes;document.getElementById('p-bytes').textContent=b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';
-    document.getElementById('pcap-section').style.display='block';curPage=1;renderTable();
-    showToast(`${d.packets.length} paquets analysés`,'success');
-  }).catch(()=>{clearInterval(itv);st.textContent="Erreur d'analyse";st.style.color='var(--danger)';});
+let pcapPkts = [], pcapStats = {}, pcapFilt = [], curPage = 1;
+const PER = 50;
+
+/* Drag & drop */
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+});
+
+function uploadFile(i) { if (i.files[0]) processFile(i.files[0]); }
+
+function processFile(file) {
+  if (!file.name.endsWith('.pcap') && !file.name.endsWith('.pcapng')) {
+    showToast('Format invalide (.pcap / .pcapng)', 'error'); return;
+  }
+  const st  = document.getElementById('upload-status');
+  const pw  = document.getElementById('prog-wrap');
+  const pb  = document.getElementById('prog-bar');
+  st.textContent = `Analyse de "${file.name}"…`;
+  st.style.color  = 'var(--indigo-lt)';
+  pw.style.display = 'block'; pb.style.width = '0%';
+
+  let prog = 0;
+  const itv = setInterval(() => { prog = Math.min(prog + Math.random()*15, 85); pb.style.width = prog+'%'; }, 150);
+
+  const fd = new FormData(); fd.append('file', file);
+  fetch('/api/upload_pcap', {method:'POST', body:fd})
+    .then(r=>r.json())
+    .then(d => {
+      clearInterval(itv); pb.style.width='100%';
+      setTimeout(() => pw.style.display='none', 500);
+      if (d.error) { st.textContent='Erreur: '+d.error; st.style.color='var(--rose)'; return; }
+      pcapPkts = d.packets; pcapStats = d.stats; pcapFilt = [...pcapPkts];
+      st.textContent = `✓ "${file.name}" — ${d.packets.length} paquets chargés`;
+      st.style.color  = 'var(--emerald)';
+      document.getElementById('p-file').textContent  = file.name;
+      document.getElementById('p-total').textContent = pcapStats.total;
+      document.getElementById('p-susp').textContent  = pcapStats.suspicious;
+      const b = pcapStats.bytes;
+      document.getElementById('p-bytes').textContent =
+        b < 1024 ? b+' B' : b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(2)+' MB';
+      document.getElementById('pcap-section').style.display = 'block';
+      curPage = 1; renderTable();
+      showToast(`${d.packets.length} paquets analysés`, 'success');
+    })
+    .catch(() => { clearInterval(itv); st.textContent="Erreur d'analyse"; st.style.color='var(--rose)'; });
 }
-function applyFilter(){const ip=document.getElementById('p-fip').value.trim(),proto=document.getElementById('p-fproto').value,susp=document.getElementById('p-fsusp').checked;pcapFilt=pcapPkts.filter(p=>{if(ip&&!p.src.includes(ip)&&!p.dst.includes(ip))return false;if(proto&&p.proto!==proto)return false;if(susp&&!p.suspicious)return false;return true;});curPage=1;renderTable();}
-function pb2(p){const m={TCP:'tcp',UDP:'udp',ICMP:'icmp'};return`<span class="badge badge-${m[p]||'other'}">${p}</span>`;}
-function renderTable(){const total=pcapFilt.length,pages=Math.ceil(total/PER),start=(curPage-1)*PER,slice=pcapFilt.slice(start,start+PER);
-  document.getElementById('p-fc').textContent=total+' paquets';
-  document.getElementById('p-pi').textContent=`Page ${curPage} / ${pages||1}`;
-  const tbody=document.getElementById('p-tbody');
-  tbody.innerHTML=slice.length?slice.map(p=>`<tr class="${p.suspicious?'suspicious':''}"><td style="color:var(--muted)">${p.id}</td><td style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted)">${p.timestamp}</td><td style="font-family:'Share Tech Mono',monospace">${p.src}</td><td style="font-family:'Share Tech Mono',monospace">${p.dst}</td><td>${pb2(p.proto)}</td><td style="color:var(--muted)">${p.sport??'—'}</td><td>${p.dport?`<strong>${p.dport}</strong>`:'—'}</td><td style="font-family:'Share Tech Mono',monospace;font-size:0.75rem">${p.flags??'—'}</td><td style="color:var(--muted)">${p.length}B</td><td>${p.suspicious?'<span class="badge badge-susp">⚠ SUSPECT</span>':'<span class="badge badge-ok">OK</span>'}</td></tr>`).join(''):'<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:40px;font-family:\'Share Tech Mono\',monospace;font-size:0.8rem;">Aucun résultat</td></tr>';
-  const pag=document.getElementById('p-pag');
-  if(pages<=1){pag.innerHTML='';return;}
-  let h=`<button class="page-btn" onclick="goPage(${curPage-1})" ${curPage===1?'disabled':''}>‹</button>`;
-  for(let i=Math.max(1,curPage-2);i<=Math.min(pages,curPage+2);i++)h+=`<button class="page-btn ${i===curPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
-  h+=`<button class="page-btn" onclick="goPage(${curPage+1})" ${curPage===pages?'disabled':''}>›</button>`;
-  pag.innerHTML=h;
+
+function applyFilter() {
+  const ip   = document.getElementById('p-fip').value.trim();
+  const proto= document.getElementById('p-fproto').value;
+  const susp = document.getElementById('p-fsusp').checked;
+  pcapFilt = pcapPkts.filter(p => {
+    if (ip    && !p.src.includes(ip) && !p.dst.includes(ip)) return false;
+    if (proto && p.proto !== proto)  return false;
+    if (susp  && !p.suspicious)      return false;
+    return true;
+  });
+  curPage = 1; renderTable();
 }
-function goPage(p){const pages=Math.ceil(pcapFilt.length/PER);if(p<1||p>pages)return;curPage=p;renderTable();}
-function goReport(){if(!pcapPkts.length){showToast('Aucune donnée','error');return;}fetch('/api/report/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({packets:pcapPkts,stats:pcapStats})}).then(r=>r.json()).then(r=>{sessionStorage.setItem('report_data',JSON.stringify(r));window.location.href='/reports';});}
+
+function badg(p) {
+  const m = {TCP:'tcp',UDP:'udp',ICMP:'icmp'};
+  return `<span class="badge badge-${m[p]||'other'}">${p}</span>`;
+}
+
+function renderTable() {
+  const total = pcapFilt.length, pages = Math.ceil(total/PER);
+  const start = (curPage-1)*PER, slice = pcapFilt.slice(start, start+PER);
+  document.getElementById('p-fc').textContent = total+' paquets';
+  document.getElementById('p-pi').textContent = `Page ${curPage} / ${pages||1}`;
+
+  const tbody = document.getElementById('p-tbody');
+  tbody.innerHTML = slice.length
+    ? slice.map(p => `
+        <tr class="${p.suspicious?'suspicious':''}">
+          <td class="text-muted">${p.id}</td>
+          <td class="mono" style="font-size:0.73rem;color:var(--text-muted)">${p.timestamp}</td>
+          <td class="mono" style="font-size:0.82rem">${p.src}</td>
+          <td class="mono" style="font-size:0.82rem">${p.dst}</td>
+          <td>${badg(p.proto)}</td>
+          <td class="text-muted">${p.sport??'—'}</td>
+          <td>${p.dport?`<strong class="mono">${p.dport}</strong>`:'—'}</td>
+          <td class="mono" style="font-size:0.73rem">${p.flags??'—'}</td>
+          <td class="text-muted">${p.length}B</td>
+          <td>${p.suspicious?'<span class="badge badge-susp">⚠ SUSPECT</span>':'<span class="badge badge-ok">OK</span>'}</td>
+        </tr>`).join('')
+    : '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:48px;font-family:\'IBM Plex Mono\',monospace;font-size:0.8rem;">Aucun résultat</td></tr>';
+
+  const pag = document.getElementById('p-pag');
+  if (pages <= 1) { pag.innerHTML=''; return; }
+  let h = `<button class="page-btn" onclick="goPage(${curPage-1})" ${curPage===1?'disabled':''}>‹</button>`;
+  for (let i = Math.max(1,curPage-2); i <= Math.min(pages,curPage+2); i++)
+    h += `<button class="page-btn ${i===curPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  h += `<button class="page-btn" onclick="goPage(${curPage+1})" ${curPage===pages?'disabled':''}>›</button>`;
+  pag.innerHTML = h;
+}
+
+function goPage(p) {
+  const pages = Math.ceil(pcapFilt.length/PER);
+  if (p < 1 || p > pages) return;
+  curPage = p; renderTable();
+}
+
+function goReport() {
+  if (!pcapPkts.length) { showToast('Aucune donnée', 'error'); return; }
+  fetch('/api/report/generate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({packets:pcapPkts, stats:pcapStats})
+  }).then(r=>r.json()).then(r => {
+    sessionStorage.setItem('report_data', JSON.stringify(r));
+    window.location.href = '/reports';
+  });
+}
 </script>
 {% endblock %}

@@ -1,65 +1,150 @@
 {% extends "base.html" %}
 {% block title %}Rapports{% endblock %}
 {% block page_title %}Rapports{% endblock %}
+
 {% block extra_style %}
 <style>
-.chart-container{position:relative;height:250px;}
-.top-list{list-style:none;}
-.top-list li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.82rem;}
-.top-list li:last-child{border-bottom:none;}
-.top-rank{width:22px;height:22px;background:var(--surface2);border:1px solid var(--border2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-family:'Share Tech Mono',monospace;color:var(--muted);flex-shrink:0;}
-.top-bar-wrap{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
-.top-bar{height:100%;border-radius:2px;}
-.top-count{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);}
-.susp-item{background:rgba(255,51,102,0.05);border:1px solid rgba(255,51,102,0.2);border-radius:3px;padding:12px 16px;margin-bottom:8px;font-size:0.82rem;}
-.susp-hdr{display:flex;gap:12px;margin-bottom:6px;align-items:center;}
-.rt2{background:rgba(255,51,102,0.1);border:1px solid rgba(255,51,102,0.2);padding:2px 8px;border-radius:2px;font-size:0.7rem;font-family:'Share Tech Mono',monospace;color:var(--danger);display:inline-block;margin:2px 4px 2px 0;}
-.empty{text-align:center;padding:60px 20px;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.85rem;}
-.empty svg{width:48px;height:48px;opacity:0.3;margin:0 auto 16px;display:block;}
-.report-meta{display:flex;gap:20px;flex-wrap:wrap;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);margin-bottom:24px;}
-.report-meta span{color:var(--text);}
-.sec-title{font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-family:'Share Tech Mono',monospace;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
-.sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.chart-container { position:relative; height:240px; }
+
+/* Top lists */
+.top-list { list-style:none; }
+.top-list li {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 0; border-bottom:1px solid var(--border);
+  font-size:0.82rem;
+}
+.top-list li:last-child { border-bottom:none; }
+.top-rank {
+  width:22px; height:22px; flex-shrink:0;
+  background:var(--surface2); border:1px solid var(--border2);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.62rem; font-family:'IBM Plex Mono',monospace;
+  color:var(--text-muted);
+}
+.top-bar-wrap { flex:1; height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+.top-bar      { height:100%; border-radius:2px; }
+.top-count    { font-family:'IBM Plex Mono',monospace; font-size:0.73rem; color:var(--text-muted); }
+
+/* Suspect items */
+.susp-item {
+  background:rgba(244,63,94,0.04);
+  border:1px solid rgba(244,63,94,0.18);
+  border-radius:8px; padding:14px 16px; margin-bottom:8px;
+}
+.susp-hdr { display:flex; gap:10px; margin-bottom:7px; align-items:center; flex-wrap:wrap; }
+.reason-tag {
+  display:inline-flex; align-items:center;
+  background:rgba(244,63,94,0.08);
+  border:1px solid rgba(244,63,94,0.22);
+  border-radius:5px; padding:2px 8px;
+  font-size:0.68rem; font-family:'IBM Plex Mono',monospace;
+  color:var(--rose); margin:2px 3px 2px 0;
+}
+
+/* Empty state */
+.empty-state {
+  text-align:center; padding:64px 20px;
+  color:var(--text-muted);
+  font-family:'IBM Plex Mono',monospace; font-size:0.82rem;
+}
+.empty-state svg {
+  width:52px; height:52px; opacity:0.25;
+  margin:0 auto 16px; display:block;
+}
+
+/* Report meta */
+.report-meta {
+  display:flex; gap:20px; flex-wrap:wrap;
+  padding:12px 18px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:8px; margin-bottom:24px;
+  font-family:'IBM Plex Mono',monospace; font-size:0.73rem;
+  color:var(--text-muted);
+}
+.report-meta strong { color:var(--text); }
+
+/* Section title */
+.sec-title {
+  font-size:0.7rem; font-weight:700;
+  letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--text-muted); font-family:'IBM Plex Mono',monospace;
+  margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-title::after { content:''; flex:1; height:1px; background:var(--border); }
 </style>
 {% endblock %}
+
 {% block content %}
 
 <!-- Actions -->
-<div class="flex gap-12 items-center mb-24">
+<div class="flex gap-10 items-center mb-24">
   <button class="btn btn-primary" onclick="generateReport()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
     Générer depuis capture
   </button>
   <button class="btn btn-danger" id="btn-pdf" onclick="downloadPDF()" disabled>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
     Exporter PDF
   </button>
   <button class="btn btn-muted" id="btn-json" onclick="exportJSON()" disabled>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
     Exporter JSON
   </button>
 </div>
 
+<!-- Empty state -->
 <div id="r-empty">
-  <div class="empty">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  <div class="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
     Cliquez sur "Générer" ou analysez un fichier PCAP pour créer un rapport
   </div>
 </div>
 
+<!-- Report content -->
 <div id="r-content" style="display:none;">
+
   <div class="report-meta" id="r-meta"></div>
 
+  <!-- Summary -->
   <div class="mb-24">
     <div class="sec-title">Résumé</div>
     <div class="grid grid-4">
-      <div class="stat-card blue"><div class="stat-label">Total Paquets</div><div class="stat-value blue" id="r-total">0</div></div>
-      <div class="stat-card green"><div class="stat-label">Volume</div><div class="stat-value green" id="r-bytes">0</div></div>
-      <div class="stat-card red"><div class="stat-label">Suspects</div><div class="stat-value red" id="r-susp">0</div></div>
-      <div class="stat-card warn"><div class="stat-label">Taux Suspect</div><div class="stat-value warn" id="r-rate">0%</div></div>
+      <div class="stat-card blue">
+        <div class="stat-label">Total Paquets</div>
+        <div class="stat-value blue" id="r-total">0</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Volume</div>
+        <div class="stat-value green" id="r-bytes">0</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Suspects</div>
+        <div class="stat-value red" id="r-susp">0</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="stat-label">Taux Suspect</div>
+        <div class="stat-value warn" id="r-rate">0%</div>
+      </div>
     </div>
   </div>
 
+  <!-- Charts -->
   <div class="mb-24">
     <div class="sec-title">Analyse Protocoles</div>
     <div class="grid grid-2">
@@ -68,76 +153,196 @@
     </div>
   </div>
 
+  <!-- Top IPs / Ports -->
   <div class="mb-24">
     <div class="sec-title">Analyse du Trafic</div>
     <div class="grid grid-3">
-      <div class="card"><div class="card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><h3>Top IP Sources</h3></div><div class="card-body"><ul class="top-list" id="r-src"></ul></div></div>
-      <div class="card"><div class="card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><h3>Top IP Destinations</h3></div><div class="card-body"><ul class="top-list" id="r-dst"></ul></div></div>
-      <div class="card"><div class="card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg><h3>Top Ports</h3></div><div class="card-body"><ul class="top-list" id="r-ports"></ul></div></div>
+      <div class="card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <h3>Top IP Sources</h3>
+        </div>
+        <div class="card-body"><ul class="top-list" id="r-src"></ul></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <h3>Top IP Destinations</h3>
+        </div>
+        <div class="card-body"><ul class="top-list" id="r-dst"></ul></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="8" rx="2"/>
+            <rect x="2" y="14" width="20" height="8" rx="2"/>
+            <line x1="6" y1="6" x2="6.01" y2="6"/>
+            <line x1="6" y1="18" x2="6.01" y2="18"/>
+          </svg>
+          <h3>Top Ports</h3>
+        </div>
+        <div class="card-body"><ul class="top-list" id="r-ports"></ul></div>
+      </div>
     </div>
   </div>
 
+  <!-- Suspicious -->
   <div class="mb-24">
     <div class="sec-title">Connexions Suspectes</div>
     <div id="r-susps"></div>
   </div>
 </div>
+
 {% endblock %}
+
 {% block scripts %}
 <script>
-let reportData=null,rD=null,rB=null,pdfPayload=null;
-const stored=sessionStorage.getItem('report_data');
-if(stored){try{reportData=JSON.parse(stored);sessionStorage.removeItem('report_data');setTimeout(()=>renderReport(reportData),200);}catch(e){}}
-function generateReport(){
-  fetch('/api/report/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})})
-  .then(r=>r.json()).then(d=>{reportData=d;renderReport(d);showToast('Rapport généré','success');});
+let reportData = null, rD = null, rB = null;
+
+const stored = sessionStorage.getItem('report_data');
+if (stored) {
+  try { reportData = JSON.parse(stored); sessionStorage.removeItem('report_data'); setTimeout(()=>renderReport(reportData), 200); }
+  catch(e) {}
 }
-function renderReport(d){
-  document.getElementById('r-empty').style.display='none';
-  document.getElementById('r-content').style.display='block';
-  document.getElementById('btn-pdf').disabled=false;
-  document.getElementById('btn-json').disabled=false;
-  const s=d.stats,total=s.total||0,susp=s.suspicious||0,byt=s.bytes||0;
-  document.getElementById('r-meta').innerHTML=`Généré le: <span>${d.generated_at}</span> &nbsp;|&nbsp; Par: <span>${d.generated_by||'admin'}</span> &nbsp;|&nbsp; Paquets: <span>${total}</span>`;
-  document.getElementById('r-total').textContent=total.toLocaleString();
-  document.getElementById('r-susp').textContent=susp.toLocaleString();
-  document.getElementById('r-rate').textContent=total?((susp/total)*100).toFixed(1)+'%':'0%';
-  const b=byt;document.getElementById('r-bytes').textContent=b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';
-  if(rD)rD.destroy();
-  rD=new Chart(document.getElementById('r-donut').getContext('2d'),{type:'doughnut',data:{labels:['TCP','UDP','ICMP','Autre'],datasets:[{data:[s.tcp||0,s.udp||0,s.icmp||0,s.other||0],backgroundColor:['rgba(0,212,255,0.7)','rgba(0,255,136,0.7)','rgba(255,170,0,0.7)','rgba(74,122,150,0.5)'],borderColor:['#00d4ff','#00ff88','#ffaa00','#4a7a96'],borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:getComputedStyle(document.documentElement).getPropertyValue('--text').trim(),font:{family:'Share Tech Mono',size:11},padding:12}}},cutout:'60%'}});
-  if(rB)rB.destroy();
-  rB=new Chart(document.getElementById('r-bar').getContext('2d'),{type:'bar',data:{labels:['TCP','UDP','ICMP','Normal','Suspects'],datasets:[{data:[s.tcp||0,s.udp||0,s.icmp||0,total-susp,susp],backgroundColor:['rgba(0,212,255,0.6)','rgba(0,255,136,0.6)','rgba(255,170,0,0.6)','rgba(74,122,150,0.4)','rgba(255,51,102,0.6)'],borderColor:['#00d4ff','#00ff88','#ffaa00','#4a7a96','#ff3366'],borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a7a96',font:{family:'Share Tech Mono',size:10}},grid:{color:'rgba(13,33,55,0.8)'}},y:{ticks:{color:'#4a7a96',font:{family:'Share Tech Mono',size:10}},grid:{color:'rgba(13,33,55,0.8)'},beginAtZero:true}}}});
-  const mx1=d.top_ips_src.length?d.top_ips_src[0][1]:1;
-  document.getElementById('r-src').innerHTML=d.top_ips_src.slice(0,8).map(([ip,c],i)=>`<li><span class="top-rank">${i+1}</span><span style="flex:1;font-family:'Share Tech Mono',monospace;font-size:0.75rem">${ip}</span><div class="top-bar-wrap"><div class="top-bar" style="width:${(c/mx1*100).toFixed(0)}%;background:var(--accent)"></div></div><span class="top-count">${c}</span></li>`).join('')||'<li style="color:var(--muted);font-size:0.8rem;padding:12px 0">Aucune donnée</li>';
-  const mx2=d.top_ips_dst.length?d.top_ips_dst[0][1]:1;
-  document.getElementById('r-dst').innerHTML=d.top_ips_dst.slice(0,8).map(([ip,c],i)=>`<li><span class="top-rank">${i+1}</span><span style="flex:1;font-family:'Share Tech Mono',monospace;font-size:0.75rem">${ip}</span><div class="top-bar-wrap"><div class="top-bar" style="width:${(c/mx2*100).toFixed(0)}%;background:var(--accent2)"></div></div><span class="top-count">${c}</span></li>`).join('')||'<li style="color:var(--muted);font-size:0.8rem;padding:12px 0">Aucune donnée</li>';
-  const mx3=d.top_ports.length?d.top_ports[0][1]:1;
-  document.getElementById('r-ports').innerHTML=d.top_ports.slice(0,8).map(([p,c],i)=>`<li><span class="top-rank">${i+1}</span><span style="flex:1;font-family:'Share Tech Mono',monospace;font-size:0.75rem">Port ${p}</span><div class="top-bar-wrap"><div class="top-bar" style="width:${(c/mx3*100).toFixed(0)}%;background:var(--warn)"></div></div><span class="top-count">${c}</span></li>`).join('')||'<li style="color:var(--muted);font-size:0.8rem;padding:12px 0">Aucune donnée</li>';
-  const susps=document.getElementById('r-susps');
-  if(!d.suspicious_packets||!d.suspicious_packets.length){susps.innerHTML='<div style="color:var(--accent2);font-family:\'Share Tech Mono\',monospace;font-size:0.8rem;padding:12px 0">✓ Aucune connexion suspecte détectée</div>';}
-  else{susps.innerHTML=d.suspicious_packets.slice(0,50).map(p=>`<div class="susp-item"><div class="susp-hdr"><span class="badge badge-susp">⚠ SUSPECT</span><span style="font-family:'Share Tech Mono',monospace;font-size:0.78rem">${p.src} → ${p.dst}</span><span class="badge badge-${(p.proto||'').toLowerCase()}">${p.proto}</span>${p.dport?`<span style="color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:0.75rem">:${p.dport}</span>`:''}<span style="color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.7rem;margin-left:auto">${p.timestamp}</span></div><div>${(p.reasons||[]).map(r=>`<span class="rt2">⚠ ${r}</span>`).join('')}</div></div>`).join('');}
+
+function generateReport() {
+  fetch('/api/report/generate', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({})})
+    .then(r=>r.json()).then(d => { reportData = d; renderReport(d); showToast('Rapport généré', 'success'); });
 }
-function downloadPDF(){
-  if(!reportData){showToast('Aucun rapport','error');return;}
-  showToast('Génération du PDF...','info');
-  fetch('/api/report/pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(reportData)})
-  .then(r=>{
-    if(!r.ok)return r.json().then(d=>{throw new Error(d.error);});
-    return r.blob();
-  }).then(blob=>{
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=`netwatch_${new Date().toISOString().slice(0,10)}.pdf`;
-    a.click();
-    showToast('PDF téléchargé !','success');
-  }).catch(e=>{showToast('Erreur PDF: '+e.message,'error');});
+
+function renderReport(d) {
+  document.getElementById('r-empty').style.display   = 'none';
+  document.getElementById('r-content').style.display = 'block';
+  document.getElementById('btn-pdf').disabled  = false;
+  document.getElementById('btn-json').disabled = false;
+
+  const s = d.stats, total = s.total||0, susp = s.suspicious||0, byt = s.bytes||0;
+
+  document.getElementById('r-meta').innerHTML =
+    `Généré le&nbsp;: <strong>${d.generated_at}</strong> &nbsp;·&nbsp; Par&nbsp;: <strong>${d.generated_by||'admin'}</strong> &nbsp;·&nbsp; Paquets&nbsp;: <strong>${total}</strong>`;
+
+  document.getElementById('r-total').textContent = total.toLocaleString();
+  document.getElementById('r-susp').textContent  = susp.toLocaleString();
+  document.getElementById('r-rate').textContent  = total ? ((susp/total)*100).toFixed(1)+'%' : '0%';
+  const b = byt;
+  document.getElementById('r-bytes').textContent =
+    b < 1024 ? b+' B' : b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(2)+' MB';
+
+  const chartText = '#5a607a';
+  const gridCol   = 'rgba(30,34,53,0.9)';
+
+  if (rD) rD.destroy();
+  rD = new Chart(document.getElementById('r-donut').getContext('2d'), {
+    type:'doughnut',
+    data: {
+      labels:['TCP','UDP','ICMP','Autre'],
+      datasets:[{
+        data:[s.tcp||0,s.udp||0,s.icmp||0,s.other||0],
+        backgroundColor:['rgba(99,102,241,0.7)','rgba(16,185,129,0.7)','rgba(245,158,11,0.7)','rgba(90,96,122,0.5)'],
+        borderColor:    ['#6366f1','#10b981','#f59e0b','#5a607a'],
+        borderWidth:1
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{color:'var(--text)',font:{family:'IBM Plex Mono',size:11},padding:14}}},
+      cutout:'60%'
+    }
+  });
+
+  if (rB) rB.destroy();
+  rB = new Chart(document.getElementById('r-bar').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels:['TCP','UDP','ICMP','Normal','Suspects'],
+      datasets:[{
+        data:[s.tcp||0,s.udp||0,s.icmp||0,total-susp,susp],
+        backgroundColor:['rgba(99,102,241,0.6)','rgba(16,185,129,0.6)','rgba(245,158,11,0.6)','rgba(90,96,122,0.4)','rgba(244,63,94,0.6)'],
+        borderColor:    ['#6366f1','#10b981','#f59e0b','#5a607a','#f43f5e'],
+        borderWidth:1
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:chartText,font:{family:'IBM Plex Mono',size:10}},grid:{color:gridCol}},
+        y:{ticks:{color:chartText,font:{family:'IBM Plex Mono',size:10}},grid:{color:gridCol},beginAtZero:true}
+      }
+    }
+  });
+
+  const mx1 = d.top_ips_src.length ? d.top_ips_src[0][1] : 1;
+  document.getElementById('r-src').innerHTML = d.top_ips_src.slice(0,8).map(([ip,c],i) =>
+    `<li><span class="top-rank">${i+1}</span>
+     <span style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:0.73rem">${ip}</span>
+     <div class="top-bar-wrap"><div class="top-bar" style="width:${(c/mx1*100).toFixed(0)}%;background:var(--indigo-lt)"></div></div>
+     <span class="top-count">${c}</span></li>`
+  ).join('') || '<li style="color:var(--text-muted);font-size:0.8rem;padding:12px 0">Aucune donnée</li>';
+
+  const mx2 = d.top_ips_dst.length ? d.top_ips_dst[0][1] : 1;
+  document.getElementById('r-dst').innerHTML = d.top_ips_dst.slice(0,8).map(([ip,c],i) =>
+    `<li><span class="top-rank">${i+1}</span>
+     <span style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:0.73rem">${ip}</span>
+     <div class="top-bar-wrap"><div class="top-bar" style="width:${(c/mx2*100).toFixed(0)}%;background:var(--emerald)"></div></div>
+     <span class="top-count">${c}</span></li>`
+  ).join('') || '<li style="color:var(--text-muted);font-size:0.8rem;padding:12px 0">Aucune donnée</li>';
+
+  const mx3 = d.top_ports.length ? d.top_ports[0][1] : 1;
+  document.getElementById('r-ports').innerHTML = d.top_ports.slice(0,8).map(([p,c],i) =>
+    `<li><span class="top-rank">${i+1}</span>
+     <span style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:0.73rem">Port ${p}</span>
+     <div class="top-bar-wrap"><div class="top-bar" style="width:${(c/mx3*100).toFixed(0)}%;background:var(--amber)"></div></div>
+     <span class="top-count">${c}</span></li>`
+  ).join('') || '<li style="color:var(--text-muted);font-size:0.8rem;padding:12px 0">Aucune donnée</li>';
+
+  const susps = document.getElementById('r-susps');
+  if (!d.suspicious_packets || !d.suspicious_packets.length) {
+    susps.innerHTML = '<div style="color:var(--emerald);font-family:\'IBM Plex Mono\',monospace;font-size:0.8rem;padding:12px 0">✓ Aucune connexion suspecte détectée</div>';
+  } else {
+    susps.innerHTML = d.suspicious_packets.slice(0,50).map(p => `
+      <div class="susp-item">
+        <div class="susp-hdr">
+          <span class="badge badge-susp">⚠ SUSPECT</span>
+          <span class="mono" style="font-size:0.78rem">${p.src} → ${p.dst}</span>
+          <span class="badge badge-${(p.proto||'').toLowerCase()}">${p.proto}</span>
+          ${p.dport ? `<span class="mono" style="color:var(--amber);font-size:0.73rem">:${p.dport}</span>` : ''}
+          <span class="mono" style="color:var(--text-muted);font-size:0.7rem;margin-left:auto">${p.timestamp}</span>
+        </div>
+        <div>${(p.reasons||[]).map(r=>`<span class="reason-tag">⚠ ${r}</span>`).join('')}</div>
+      </div>`).join('');
+  }
 }
-function exportJSON(){
-  if(!reportData){showToast('Aucun rapport','error');return;}
-  const blob=new Blob([JSON.stringify(reportData,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`netwatch_${new Date().toISOString().slice(0,10)}.json`;a.click();
-  showToast('JSON exporté','success');
+
+function downloadPDF() {
+  if (!reportData) { showToast('Aucun rapport', 'error'); return; }
+  showToast('Génération du PDF…', 'info');
+  fetch('/api/report/pdf', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(reportData)})
+    .then(r => { if (!r.ok) return r.json().then(d=>{throw new Error(d.error);}); return r.blob(); })
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `netwatch_${new Date().toISOString().slice(0,10)}.pdf`;
+      a.click();
+      showToast('PDF téléchargé !', 'success');
+    })
+    .catch(e => showToast('Erreur PDF: '+e.message, 'error'));
+}
+
+function exportJSON() {
+  if (!reportData) { showToast('Aucun rapport', 'error'); return; }
+  const blob = new Blob([JSON.stringify(reportData, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `NetWatch_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('JSON exporté', 'success');
 }
 </script>
 {% endblock %}

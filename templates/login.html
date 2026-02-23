@@ -3,95 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NetWatch — Connexion</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<title>ICMD — Connexion</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-[data-theme="dark"] {
-  --bg:#040810;--surface:#080f1a;--border:#0d2137;--border2:#1a3a52;
-  --accent:#00d4ff;--accent2:#00ff88;--danger:#ff3366;--text:#c8e6f5;--muted:#4a7a96;
+:root {
+  --bg:#0b0c10; --surface:#13151d; --surface2:#1a1d28;
+  --border:#1e2235; --border2:#2a2f4a;
+  --indigo:#6366f1; --indigo-lt:#818cf8; --violet:#8b5cf6;
+  --emerald:#10b981; --rose:#f43f5e;
+  --text:#e2e5f0; --text-sec:#9097b5; --text-muted:#5a607a;
+  --glow-ind:rgba(99,102,241,0.2);
 }
 [data-theme="light"] {
-  --bg:#f0f4f8;--surface:#ffffff;--border:#d0dce8;--border2:#b0c4d8;
-  --accent:#0088bb;--accent2:#00aa55;--danger:#dd2255;--text:#1a2a3a;--muted:#607080;
+  --bg:#f5f6fa; --surface:#ffffff; --surface2:#f0f2fb;
+  --border:#dde0f0; --border2:#c8cce0;
+  --indigo:#4f52d9; --indigo-lt:#6366f1; --violet:#7c3aed;
+  --emerald:#059669; --rose:#e11d48;
+  --text:#1a1c2e; --text-sec:#4a5080; --text-muted:#8890aa;
+  --glow-ind:rgba(99,102,241,0.1);
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);font-family:'Rajdhani',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:background 0.3s;}
-[data-theme="dark"] body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
-[data-theme="dark"] body::after{content:'';position:fixed;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scan 4s linear infinite;opacity:0.4;}
-@keyframes scan{0%{top:-2px}100%{top:100vh}}
-.corner{position:fixed;width:100px;height:100px;border-color:var(--accent);border-style:solid;opacity:0.15;}
-.corner.tl{top:20px;left:20px;border-width:2px 0 0 2px;}
-.corner.tr{top:20px;right:20px;border-width:2px 2px 0 0;}
-.corner.bl{bottom:20px;left:20px;border-width:0 0 2px 2px;}
-.corner.br{bottom:20px;right:20px;border-width:0 2px 2px 0;}
-.wrap{width:400px;position:relative;z-index:10;}
-.logo{text-align:center;margin-bottom:36px;}
-.logo-icon{width:64px;height:64px;margin:0 auto 14px;background:var(--surface);border:1px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(0,212,255,0.25);position:relative;}
-.logo-icon svg{width:30px;height:30px;color:var(--accent);}
-.logo-icon::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--accent);opacity:0.25;animation:pulse 2s ease-out infinite;}
-@keyframes pulse{0%{transform:scale(1);opacity:0.25}100%{transform:scale(1.4);opacity:0}}
-.logo h1{font-family:'Share Tech Mono',monospace;font-size:1.9rem;color:var(--accent);letter-spacing:6px;}
-.logo p{color:var(--muted);font-size:0.78rem;letter-spacing:3px;text-transform:uppercase;margin-top:4px;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:36px;position:relative;overflow:hidden;transition:background 0.3s;}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
-.lbl{font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
-.lbl::after{content:'';flex:1;height:1px;background:var(--border);}
-.field{margin-bottom:18px;}
-.field label{display:block;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-family:'Share Tech Mono',monospace;}
-.fw{position:relative;display:flex;align-items:center;}
-.fw svg{position:absolute;left:13px;width:15px;height:15px;color:var(--muted);pointer-events:none;}
-.fw input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:11px 13px 11px 38px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.88rem;letter-spacing:1px;transition:border-color 0.2s,box-shadow 0.2s;outline:none;}
-.fw input:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 12px rgba(0,212,255,0.1);}
-.err{background:rgba(255,51,102,0.1);border:1px solid var(--danger);border-radius:3px;padding:9px 13px;color:var(--danger);font-size:0.78rem;font-family:'Share Tech Mono',monospace;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
-.btn{width:100%;padding:13px;background:transparent;border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;margin-top:6px;}
-.btn::before{content:'';position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform 0.3s ease;z-index:-1;}
-.btn:hover{color:var(--bg);}
-.btn:hover::before{transform:scaleX(1);}
-.hint{text-align:center;margin-top:20px;color:var(--muted);font-size:0.72rem;font-family:'Share Tech Mono',monospace;}
-.hint span{color:var(--accent2);}
-.theme-btn{position:fixed;top:20px;right:20px;background:var(--surface);border:1px solid var(--border2);border-radius:3px;padding:8px 14px;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;z-index:100;transition:all 0.2s;}
-.theme-btn:hover{border-color:var(--accent);color:var(--accent);}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  min-height: 100vh;
+  display: flex; align-items:center; justify-content:center;
+  overflow: hidden; position:relative;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Subtle grid background */
+[data-theme="dark"] body::before {
+  content:''; position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events:none;
+}
+
+/* Ambient glow blobs */
+.glow-blob {
+  position:fixed; border-radius:50%;
+  filter: blur(100px); pointer-events:none; z-index:0;
+  opacity: 0.12;
+}
+.glow-blob.one {
+  width:500px; height:500px;
+  background: var(--indigo);
+  top:-150px; right:-100px;
+}
+.glow-blob.two {
+  width:400px; height:400px;
+  background: var(--violet);
+  bottom:-100px; left:-100px;
+}
+
+/* Wrap */
+.wrap {
+  width: 420px; position:relative; z-index:10;
+}
+
+/* Logo */
+.logo {
+  text-align:center; margin-bottom:32px;
+}
+.logo-icon-wrap {
+  position:relative; width:64px; height:64px;
+  margin: 0 auto 16px;
+}
+.logo-icon {
+  width:64px; height:64px;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  border-radius:16px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 8px 32px var(--glow-ind);
+}
+.logo-icon svg { width:28px; height:28px; color:#fff; }
+.logo-ring {
+  position:absolute; inset:-5px;
+  border: 1px solid var(--indigo);
+  border-radius:20px; opacity:0.25;
+  animation: ring-pulse 2.5s ease-out infinite;
+}
+@keyframes ring-pulse {
+  0%   { transform:scale(1);   opacity:0.25; }
+  100% { transform:scale(1.25); opacity:0; }
+}
+.logo-title {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:1.8rem; font-weight:600;
+  color: var(--text); letter-spacing:0.05em;
+}
+.logo-title span { color: var(--indigo-lt); }
+.logo-sub {
+  font-size:0.7rem; color:var(--text-muted);
+  letter-spacing:0.18em; text-transform:uppercase;
+  margin-top:4px;
+}
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 36px;
+  position:relative; overflow:hidden;
+}
+.card::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--indigo) 40%, var(--violet) 70%, transparent);
+}
+
+.card-heading {
+  font-size:0.62rem; font-weight:700;
+  letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--text-muted);
+  font-family:'IBM Plex Mono',monospace;
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:24px;
+}
+.card-heading::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* Error */
+.err-box {
+  background: rgba(244,63,94,0.08);
+  border: 1px solid rgba(244,63,94,0.3);
+  border-radius:7px; padding:10px 14px;
+  color:var(--rose); font-size:0.78rem;
+  font-family:'IBM Plex Mono',monospace;
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:20px;
+}
+.err-box svg { width:14px; height:14px; flex-shrink:0; }
+
+/* Fields */
+.field { margin-bottom:18px; }
+.field label {
+  display:block; font-size:0.68rem;
+  font-weight:600; letter-spacing:0.1em;
+  text-transform:uppercase; color:var(--text-muted);
+  margin-bottom:7px;
+}
+.input-wrap { position:relative; display:flex; align-items:center; }
+.input-wrap svg {
+  position:absolute; left:14px;
+  width:15px; height:15px; color:var(--text-muted);
+  pointer-events:none;
+}
+.input-wrap input {
+  width:100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius:8px; padding:11px 14px 11px 40px;
+  color:var(--text);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.88rem; letter-spacing:0.04em;
+  outline:none; transition:all 0.2s;
+}
+.input-wrap input:focus {
+  border-color:var(--indigo);
+  box-shadow:0 0 0 3px rgba(99,102,241,0.12);
+}
+.input-wrap input::placeholder { color:var(--text-muted); }
+
+/* Submit */
+.btn-submit {
+  width:100%; margin-top:6px;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  border:none; border-radius:8px;
+  color:#fff; font-family:'IBM Plex Sans',sans-serif;
+  font-size:0.9rem; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase;
+  cursor:pointer; transition:all 0.2s;
+  box-shadow: 0 4px 16px var(--glow-ind);
+}
+.btn-submit:hover {
+  box-shadow: 0 6px 24px rgba(99,102,241,0.45);
+  transform:translateY(-1px);
+}
+
+/* Hint */
+.hint {
+  text-align:center; margin-top:20px;
+  color:var(--text-muted); font-size:0.7rem;
+  font-family:'IBM Plex Mono',monospace;
+}
+.hint em { color:var(--indigo-lt); font-style:normal; }
+
+/* Theme button */
+.theme-btn {
+  position:fixed; top:20px; right:20px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius:8px; padding:8px 14px;
+  color:var(--text-sec);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.7rem; cursor:pointer; z-index:100;
+  transition:all 0.2s;
+}
+.theme-btn:hover { border-color:var(--indigo); color:var(--indigo-lt); }
+
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
 </style>
 </head>
 <body>
-<div class="corner tl"></div><div class="corner tr"></div>
-<div class="corner bl"></div><div class="corner br"></div>
+
+<div class="glow-blob one"></div>
+<div class="glow-blob two"></div>
+
 <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">☀ Mode clair</button>
+
 <div class="wrap">
   <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 6v6l4 2"/>
-        <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.3"/>
-      </svg>
+    <div class="logo-icon-wrap">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="logo-ring"></div>
     </div>
-    <h1>NetWatch</h1>
-    <p>Analyse de Trafic Réseau</p>
+    <div class="logo-title">Net<span>Watch</span></div>
+    <div class="logo-sub">Analyse de Trafic Réseau</div>
   </div>
+
   <div class="card">
-    <div class="lbl">Authentification requise</div>
-    {% if error %}<div class="err"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{{ error }}</div>{% endif %}
+    <div class="card-heading">Authentification requise</div>
+
+    {% if error %}
+    <div class="err-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ error }}
+    </div>
+    {% endif %}
+
     <form method="POST">
       <div class="field">
         <label>Identifiant</label>
-        <div class="fw">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
           <input type="text" name="username" placeholder="admin" autocomplete="off" required>
         </div>
       </div>
+
       <div class="field">
         <label>Mot de passe</label>
-        <div class="fw">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
           <input type="password" name="password" placeholder="••••••••" required>
         </div>
       </div>
-      <button type="submit" class="btn">Accéder au système</button>
+
+      <button type="submit" class="btn-submit">Accéder au système</button>
     </form>
   </div>
-  <p class="hint">Identifiants par défaut : <span>admin</span> / <span>admin123</span></p>
+
+  <p class="hint">Identifiants par défaut : <em>admin</em> / <em>admin123</em></p>
 </div>
+
 <script>
 const saved = localStorage.getItem('nw-theme') || 'dark';
 document.documentElement.setAttribute('data-theme', saved);
