@@ -1,0 +1,607 @@
+{
+  "generated_at": "2026-02-26 09:55:13",
+  "generated_by": "admin",
+  "stats": {
+    "total": 1912,
+    "tcp": 1251,
+    "udp": 661,
+    "icmp": 0,
+    "other": 0,
+    "suspicious": 31,
+    "bytes": 928087,
+    "start_time": "2026-02-26 09:54:06"
+  },
+  "top_ips_src": [
+    [
+      "192.168.129.183",
+      845
+    ],
+    [
+      "142.250.184.14",
+      245
+    ],
+    [
+      "18.235.168.50",
+      97
+    ],
+    [
+      "142.251.142.132",
+      79
+    ],
+    [
+      "52.215.98.41",
+      78
+    ],
+    [
+      "52.209.185.35",
+      56
+    ],
+    [
+      "34.250.193.244",
+      41
+    ],
+    [
+      "34.253.101.129",
+      38
+    ],
+    [
+      "44.198.86.118",
+      34
+    ],
+    [
+      "192.168.129.140",
+      33
+    ]
+  ],
+  "top_ips_dst": [
+    [
+      "192.168.129.183",
+      1067
+    ],
+    [
+      "142.250.184.14",
+      91
+    ],
+    [
+      "52.215.98.41",
+      78
+    ],
+    [
+      "18.235.168.50",
+      76
+    ],
+    [
+      "52.209.185.35",
+      63
+    ],
+    [
+      "142.251.142.132",
+      49
+    ],
+    [
+      "34.250.193.244",
+      42
+    ],
+    [
+      "192.168.129.140",
+      34
+    ],
+    [
+      "44.198.86.118",
+      33
+    ],
+    [
+      "34.253.101.129",
+      31
+    ]
+  ],
+  "top_ports": [
+    [
+      "443",
+      805
+    ],
+    [
+      "54189",
+      245
+    ],
+    [
+      "41805",
+      80
+    ],
+    [
+      "60636",
+      79
+    ],
+    [
+      "53",
+      34
+    ],
+    [
+      "58029",
+      27
+    ],
+    [
+      "41799",
+      27
+    ],
+    [
+      "41785",
+      26
+    ],
+    [
+      "41793",
+      25
+    ],
+    [
+      "41788",
+      24
+    ]
+  ],
+  "suspicious_packets": [
+    {
+      "id": 1,
+      "timestamp": "09:54:06.561",
+      "src": "192.168.129.183",
+      "dst": "192.243.241.135",
+      "proto": "TCP",
+      "sport": 41765,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 6,
+      "timestamp": "09:54:07.295",
+      "src": "192.168.129.183",
+      "dst": "184.24.77.24",
+      "proto": "TCP",
+      "sport": 41780,
+      "dport": 80,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 38,
+      "timestamp": "09:54:10.194",
+      "src": "192.168.129.183",
+      "dst": "52.48.202.212",
+      "proto": "TCP",
+      "sport": 41781,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 41,
+      "timestamp": "09:54:10.201",
+      "src": "192.168.129.183",
+      "dst": "172.66.0.163",
+      "proto": "TCP",
+      "sport": 41782,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 84,
+      "timestamp": "09:54:10.844",
+      "src": "192.168.129.183",
+      "dst": "2.20.168.201",
+      "proto": "TCP",
+      "sport": 41783,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 143,
+      "timestamp": "09:54:12.720",
+      "src": "192.168.129.183",
+      "dst": "52.48.202.212",
+      "proto": "TCP",
+      "sport": 41784,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 610,
+      "timestamp": "09:54:16.445",
+      "src": "192.168.129.183",
+      "dst": "34.250.67.152",
+      "proto": "TCP",
+      "sport": 41785,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 690,
+      "timestamp": "09:54:17.987",
+      "src": "192.168.129.183",
+      "dst": "54.74.179.44",
+      "proto": "TCP",
+      "sport": 41786,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 714,
+      "timestamp": "09:54:18.232",
+      "src": "192.168.129.183",
+      "dst": "44.198.86.118",
+      "proto": "TCP",
+      "sport": 41787,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 738,
+      "timestamp": "09:54:18.577",
+      "src": "192.168.129.183",
+      "dst": "52.215.98.41",
+      "proto": "TCP",
+      "sport": 41788,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 739,
+      "timestamp": "09:54:18.579",
+      "src": "192.168.129.183",
+      "dst": "52.215.98.41",
+      "proto": "TCP",
+      "sport": 41789,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 778,
+      "timestamp": "09:54:18.908",
+      "src": "192.168.129.183",
+      "dst": "52.209.185.35",
+      "proto": "TCP",
+      "sport": 41790,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 806,
+      "timestamp": "09:54:19.988",
+      "src": "192.168.129.183",
+      "dst": "52.209.185.35",
+      "proto": "TCP",
+      "sport": 41791,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 807,
+      "timestamp": "09:54:19.993",
+      "src": "192.168.129.183",
+      "dst": "34.250.193.244",
+      "proto": "TCP",
+      "sport": 41792,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 808,
+      "timestamp": "09:54:19.996",
+      "src": "192.168.129.183",
+      "dst": "34.250.193.244",
+      "proto": "TCP",
+      "sport": 41793,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 809,
+      "timestamp": "09:54:19.998",
+      "src": "192.168.129.183",
+      "dst": "52.209.185.35",
+      "proto": "TCP",
+      "sport": 41794,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 908,
+      "timestamp": "09:54:20.933",
+      "src": "192.168.129.183",
+      "dst": "184.24.77.24",
+      "proto": "TCP",
+      "sport": 41795,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 911,
+      "timestamp": "09:54:20.998",
+      "src": "192.168.129.183",
+      "dst": "3.233.142.19",
+      "proto": "TCP",
+      "sport": 41796,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 912,
+      "timestamp": "09:54:21.008",
+      "src": "192.168.129.183",
+      "dst": "34.253.101.129",
+      "proto": "TCP",
+      "sport": 41797,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 927,
+      "timestamp": "09:54:21.150",
+      "src": "192.168.129.183",
+      "dst": "184.24.77.24",
+      "proto": "TCP",
+      "sport": 41798,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1103,
+      "timestamp": "09:54:24.080",
+      "src": "192.168.129.183",
+      "dst": "13.224.83.125",
+      "proto": "TCP",
+      "sport": 41799,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1168,
+      "timestamp": "09:54:24.496",
+      "src": "192.168.129.183",
+      "dst": "52.45.87.101",
+      "proto": "TCP",
+      "sport": 41800,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1214,
+      "timestamp": "09:54:25.254",
+      "src": "192.168.129.183",
+      "dst": "18.235.168.50",
+      "proto": "TCP",
+      "sport": 41801,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1241,
+      "timestamp": "09:54:25.631",
+      "src": "192.168.129.183",
+      "dst": "52.215.98.41",
+      "proto": "TCP",
+      "sport": 41802,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1253,
+      "timestamp": "09:54:25.746",
+      "src": "192.168.129.183",
+      "dst": "52.215.98.41",
+      "proto": "TCP",
+      "sport": 41803,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1328,
+      "timestamp": "09:54:26.448",
+      "src": "192.168.129.183",
+      "dst": "44.198.86.118",
+      "proto": "TCP",
+      "sport": 41804,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1363,
+      "timestamp": "09:54:27.401",
+      "src": "192.168.129.183",
+      "dst": "18.235.168.50",
+      "proto": "TCP",
+      "sport": 41805,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1563,
+      "timestamp": "09:54:28.857",
+      "src": "192.168.129.183",
+      "dst": "34.253.101.129",
+      "proto": "TCP",
+      "sport": 41806,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1564,
+      "timestamp": "09:54:28.859",
+      "src": "192.168.129.183",
+      "dst": "34.98.110.65",
+      "proto": "TCP",
+      "sport": 41807,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1629,
+      "timestamp": "09:54:31.331",
+      "src": "192.168.129.183",
+      "dst": "34.233.184.229",
+      "proto": "TCP",
+      "sport": 41808,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    },
+    {
+      "id": 1782,
+      "timestamp": "09:54:50.109",
+      "src": "192.168.129.183",
+      "dst": "150.171.28.11",
+      "proto": "TCP",
+      "sport": 41811,
+      "dport": 443,
+      "flags": "S",
+      "length": 66,
+      "suspicious": true,
+      "reasons": [
+        "Flag TCP suspect: S"
+      ]
+    }
+  ]
+}
